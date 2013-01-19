@@ -3,20 +3,22 @@ package uk.co.mindbadger.footballresultsanalyser.domain;
 public class DomainObjectFactoryImpl implements DomainObjectFactory {
 
     @Override
-    public Division createDivision(Integer arg0, String arg1) {
-	// TODO Auto-generated method stub
-	return null;
+    public Division createDivision(Integer divisionId, String divisionName) {
+	Division division = new DivisionImpl();
+	
+	division.setDivisionId(divisionId);
+	division.setDivisionName(divisionName);
+	
+	return division;
     }
 
     @Override
     public Fixture createFixture(Integer arg0, Season arg1, Team arg2, Team arg3) {
-	// TODO Auto-generated method stub
-	return null;
+	return new FixtureImpl();
     }
 
     @Override
     public Season createSeason(Integer arg0) {
-	// TODO Auto-generated method stub
 	return null;
     }
 
@@ -39,15 +41,18 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
     }
 
     @Override
-    public SeasonDivisionId createSeasonDivisionId(Season arg0, Division arg1) {
-	// TODO Auto-generated method stub
-	return null;
+    public SeasonDivisionId createSeasonDivisionId(Season season, Division division) {
+	SeasonDivisionId seasonDivisionId = new SeasonDivisionIdImpl ();
+	seasonDivisionId.setSeason(season);
+	seasonDivisionId.setDivision(division);
+	return seasonDivisionId;
     }
 
     @Override
-    public SeasonDivisionId createSeasonDivisionTeamId(SeasonDivision arg0, Team arg1) {
-	// TODO Auto-generated method stub
-	return null;
+    public SeasonDivisionTeamId createSeasonDivisionTeamId(SeasonDivision seasonDivision, Team team) {
+	SeasonDivisionTeamId seasonDivisionTeamId = new SeasonDivisionTeamIdImpl ();
+	seasonDivisionTeamId.setSeasonDivision(seasonDivision);
+	seasonDivisionTeamId.setTeam(team);
+	return seasonDivisionTeamId;
     }
-
 }

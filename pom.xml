@@ -32,7 +32,6 @@
       <groupId>uk.co.mindbadger.football-results-dao</groupId>
       <artifactId>football-results-dao</artifactId>
       <version>1.0-SNAPSHOT</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>

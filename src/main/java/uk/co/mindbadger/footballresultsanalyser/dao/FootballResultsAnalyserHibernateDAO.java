@@ -10,12 +10,15 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import uk.co.mindbadger.footballresultsanalyser.domain.Division;
+import uk.co.mindbadger.footballresultsanalyser.domain.DivisionImpl;
 import uk.co.mindbadger.footballresultsanalyser.domain.DomainObjectFactory;
 import uk.co.mindbadger.footballresultsanalyser.domain.Fixture;
 import uk.co.mindbadger.footballresultsanalyser.domain.Season;
 import uk.co.mindbadger.footballresultsanalyser.domain.SeasonDivision;
 import uk.co.mindbadger.footballresultsanalyser.domain.SeasonDivisionId;
+import uk.co.mindbadger.footballresultsanalyser.domain.SeasonDivisionImpl;
 import uk.co.mindbadger.footballresultsanalyser.domain.SeasonDivisionTeam;
+import uk.co.mindbadger.footballresultsanalyser.domain.SeasonImpl;
 import uk.co.mindbadger.footballresultsanalyser.hibernate.HibernateUtil;
 
 public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnalyserDAO {
@@ -49,7 +52,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	tx = session.beginTransaction();
 
 	// Get the Seasons
-	seasons = session.createQuery("from Season").list();
+	seasons = session.createQuery("from SeasonImpl").list();
 
 	tx.commit();
 
@@ -65,7 +68,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	Season season = null;
 	tx = session.beginTransaction();
 
-	season = (Season) session.get(Season.class, seasonNumber);
+	season = (Season) session.get(SeasonImpl.class, seasonNumber);
 
 	// Get the Seasons
 	// List seasonDivisions =
@@ -88,12 +91,12 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	SeasonDivision seasonDivision = null;
 	tx = session.beginTransaction();
 
-	Season season = (Season) session.get(Season.class, seasonNumber);
-	Division division = (Division) session.get(Division.class, divisionId);
+	Season season = (Season) session.get(SeasonImpl.class, seasonNumber);
+	Division division = (Division) session.get(DivisionImpl.class, divisionId);
 
 	SeasonDivisionId seasonDivisionId = domainObjectFactory.createSeasonDivisionId(season, division);
 
-	seasonDivision = (SeasonDivision) session.get(SeasonDivision.class, seasonDivisionId);
+	seasonDivision = (SeasonDivision) session.get(SeasonDivisionImpl.class, seasonDivisionId);
 
 	tx.commit();
 
@@ -109,7 +112,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	List fixtures = null;
 	tx = session.beginTransaction();
 
-	fixtures = session.createQuery("select F from Fixture F join F.division D join F.season S" + " where S.ssnNum = " + seasonNumber + " and D.divId = " + divisionId + " order by F.fixtureDate").list();
+	fixtures = session.createQuery("select F from FixtureImpl F join F.division D join F.season S" + " where S.seasonNumber = " + seasonNumber + " and D.divisionId = " + divisionId + " order by F.fixtureDate").list();
 
 	tx.commit();
 
