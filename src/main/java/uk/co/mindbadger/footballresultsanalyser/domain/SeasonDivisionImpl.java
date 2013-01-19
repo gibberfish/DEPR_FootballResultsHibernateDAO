@@ -9,10 +9,15 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.hibernate.annotations.Target;
 
 @Entity
 @Table(name = "season_division", catalog = "football")
@@ -24,12 +29,13 @@ import javax.persistence.Transient;
 public class SeasonDivisionImpl implements SeasonDivision {
 	private static final long serialVersionUID = -862413151112264079L;
 	
-	private SeasonDivisionId primaryKey = new SeasonDivisonIdImpl();
+	private SeasonDivisionId primaryKey = new SeasonDivisionIdImpl();
 	private int divisionPosition;
 	private Set<SeasonDivisionTeam> teamsInSeasonDivision = new HashSet<SeasonDivisionTeam>(0);
 	
 	@Override
 	@EmbeddedId
+	@Target(SeasonDivisionIdImpl.class)
 	public SeasonDivisionId getPrimaryKey() {
 		return primaryKey;
 	}
@@ -40,6 +46,7 @@ public class SeasonDivisionImpl implements SeasonDivision {
 
 	@Override
 	@Transient
+	@Target(SeasonImpl.class)
 	public Season getSeason() {
 		return primaryKey.getSeason();
 	}
@@ -50,6 +57,7 @@ public class SeasonDivisionImpl implements SeasonDivision {
 	
 	@Override
 	@Transient
+	@Target(DivisionImpl.class)
 	public Division getDivision() {
 		return primaryKey.getDivision();
 	}

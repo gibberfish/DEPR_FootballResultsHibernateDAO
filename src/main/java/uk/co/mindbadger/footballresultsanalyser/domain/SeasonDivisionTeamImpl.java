@@ -4,9 +4,17 @@ import javax.persistence.AssociationOverride;
 import javax.persistence.AssociationOverrides;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.hibernate.annotations.Target;
 
 @Entity
 @Table(name = "season_division_team", catalog = "football")
@@ -23,6 +31,7 @@ public class SeasonDivisionTeamImpl implements SeasonDivisionTeam {
 
     @Override
     @EmbeddedId
+    @Target(SeasonDivisionTeamIdImpl.class)
     public SeasonDivisionTeamId getPrimaryKey() {
 	return primaryKey;
     }
@@ -34,6 +43,7 @@ public class SeasonDivisionTeamImpl implements SeasonDivisionTeam {
 
     @Override
     @Transient
+    @Target(SeasonDivisionImpl.class)
     public SeasonDivision getSeasonDivision() {
 	return primaryKey.getSeasonDivision();
     }
@@ -45,6 +55,7 @@ public class SeasonDivisionTeamImpl implements SeasonDivisionTeam {
 
     @Override
     @Transient
+    @Target(TeamImpl.class)
     public Team getTeam() {
 	return primaryKey.getTeam();
     }

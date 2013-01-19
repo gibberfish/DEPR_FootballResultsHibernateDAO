@@ -4,7 +4,7 @@ import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
 
 @Embeddable
-public class SeasonDivisonIdImpl implements SeasonDivisionId {
+public class SeasonDivisionIdImpl implements SeasonDivisionId {
     private static final long serialVersionUID = 2044020611013634053L;
 
     private Season season;
