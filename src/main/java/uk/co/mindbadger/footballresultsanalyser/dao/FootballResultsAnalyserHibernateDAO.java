@@ -19,111 +19,150 @@ import uk.co.mindbadger.footballresultsanalyser.domain.SeasonDivisionId;
 import uk.co.mindbadger.footballresultsanalyser.domain.SeasonDivisionImpl;
 import uk.co.mindbadger.footballresultsanalyser.domain.SeasonDivisionTeam;
 import uk.co.mindbadger.footballresultsanalyser.domain.SeasonImpl;
+import uk.co.mindbadger.footballresultsanalyser.domain.Team;
 import uk.co.mindbadger.footballresultsanalyser.hibernate.HibernateUtil;
 
 public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnalyserDAO {
 
-    private Map<Thread, Session> sessions = new HashMap<Thread, Session>();
-    private DomainObjectFactory domainObjectFactory;
+	private Map<Thread, Session> sessions = new HashMap<Thread, Session>();
+	private DomainObjectFactory domainObjectFactory;
 
-    @Override
-    public void startSession() {
-	SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-	Session session = sessionFactory.openSession();
+	@Override
+	public void startSession() {
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+		Session session = sessionFactory.openSession();
 
-	sessions.put(Thread.currentThread(), session);
-    }
+		sessions.put(Thread.currentThread(), session);
+	}
 
-    @Override
-    public void closeSession() {
-	Session session = sessions.get(Thread.currentThread());
-	session.close();
-	
-	sessions.remove(session);
-    }
+	@Override
+	public void closeSession() {
+		Session session = sessions.get(Thread.currentThread());
+		session.close();
 
-    @Override
-    public List<Season> getSeasons() {
-	Transaction tx = null;
+		sessions.remove(session);
+	}
 
-	Session session = sessions.get(Thread.currentThread());
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Season> getSeasons() {
+		Transaction tx = null;
 
-	List seasons = null;
-	tx = session.beginTransaction();
+		Session session = sessions.get(Thread.currentThread());
 
-	// Get the Seasons
-	seasons = session.createQuery("from SeasonImpl").list();
+		List<Season> seasons = null;
+		tx = session.beginTransaction();
 
-	tx.commit();
+		// Get the Seasons
+		seasons = session.createQuery("from SeasonImpl").list();
 
-	return seasons;
-    }
+		tx.commit();
 
-    @Override
-    public Set<SeasonDivision> getDivisionsForSeason(int seasonNumber) {
-	Transaction tx = null;
+		return seasons;
+	}
 
-	Session session = sessions.get(Thread.currentThread());
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Division> getAllDivisions() {
+		Transaction tx = null;
 
-	Season season = null;
-	tx = session.beginTransaction();
+		Session session = sessions.get(Thread.currentThread());
 
-	season = (Season) session.get(SeasonImpl.class, seasonNumber);
+		List<Division> divisions = null;
+		tx = session.beginTransaction();
 
-	// Get the Seasons
-	// List seasonDivisions =
-	// session.createQuery("from SeasonDivision SD where SD.season.ssnNum = "
-	// + seasonNumber + " order by SD.divPos").list();
-	// List seasonDivisions =
-	// session.createQuery("from SeasonDivision SD").list();
+		// Get the Divisions
+		divisions = session.createQuery("from Division").list();
 
-	tx.commit();
+		tx.commit();
 
-	return season.getDivisionsInSeason();
-    }
+		return divisions;
+	}
 
-    @Override
-    public Set<SeasonDivisionTeam> getTeamsForDivisionInSeason(int seasonNumber, int divisionId) {
-	Transaction tx = null;
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Team> getAllTeams() {
+		Transaction tx = null;
 
-	Session session = sessions.get(Thread.currentThread());
+		Session session = sessions.get(Thread.currentThread());
 
-	SeasonDivision seasonDivision = null;
-	tx = session.beginTransaction();
+		List<Team> teams = null;
+		tx = session.beginTransaction();
 
-	Season season = (Season) session.get(SeasonImpl.class, seasonNumber);
-	Division division = (Division) session.get(DivisionImpl.class, divisionId);
+		// Get the Divisions
+		teams = session.createQuery("from Team").list();
 
-	SeasonDivisionId seasonDivisionId = domainObjectFactory.createSeasonDivisionId(season, division);
+		tx.commit();
 
-	seasonDivision = (SeasonDivision) session.get(SeasonDivisionImpl.class, seasonDivisionId);
+		return teams;
+	}
 
-	tx.commit();
+	@Override
+	public Set<SeasonDivision> getDivisionsForSeason(int seasonNumber) {
+		Transaction tx = null;
 
-	return seasonDivision.getTeamsInSeasonDivision();
-    }
+		Session session = sessions.get(Thread.currentThread());
 
-    @Override
-    public List<Fixture> getFixturesForTeamInDivisionInSeason(int seasonNumber, int divisionId, int teamId) {
-	Transaction tx = null;
+		Season season = null;
+		tx = session.beginTransaction();
 
-	Session session = sessions.get(Thread.currentThread());
+		season = (Season) session.get(SeasonImpl.class, seasonNumber);
 
-	List fixtures = null;
-	tx = session.beginTransaction();
+		// Get the Seasons
+		// List seasonDivisions =
+		// session.createQuery("from SeasonDivision SD where SD.season.ssnNum = "
+		// + seasonNumber + " order by SD.divPos").list();
+		// List seasonDivisions =
+		// session.createQuery("from SeasonDivision SD").list();
 
-	fixtures = session.createQuery("select F from FixtureImpl F join F.division D join F.season S" + " where S.seasonNumber = " + seasonNumber + " and D.divisionId = " + divisionId + " order by F.fixtureDate").list();
+		tx.commit();
 
-	tx.commit();
+		return season.getDivisionsInSeason();
+	}
 
-	return fixtures;
-    }
+	@Override
+	public Set<SeasonDivisionTeam> getTeamsForDivisionInSeason(int seasonNumber, int divisionId) {
+		Transaction tx = null;
 
-    public DomainObjectFactory getDomainObjectFactory() {
-	return domainObjectFactory;
-    }
+		Session session = sessions.get(Thread.currentThread());
 
-    public void setDomainObjectFactory(DomainObjectFactory domainObjectFactory) {
-	this.domainObjectFactory = domainObjectFactory;
-    }
+		SeasonDivision seasonDivision = null;
+		tx = session.beginTransaction();
+
+		Season season = (Season) session.get(SeasonImpl.class, seasonNumber);
+		Division division = (Division) session.get(DivisionImpl.class, divisionId);
+
+		SeasonDivisionId seasonDivisionId = domainObjectFactory.createSeasonDivisionId(season, division);
+
+		seasonDivision = (SeasonDivision) session.get(SeasonDivisionImpl.class, seasonDivisionId);
+
+		tx.commit();
+
+		return seasonDivision.getTeamsInSeasonDivision();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Fixture> getFixturesForTeamInDivisionInSeason(int seasonNumber, int divisionId, int teamId) {
+		Transaction tx = null;
+
+		Session session = sessions.get(Thread.currentThread());
+
+		List<Fixture> fixtures = null;
+		tx = session.beginTransaction();
+
+		fixtures = session.createQuery("select F from FixtureImpl F join F.division D join F.season S" + " where S.seasonNumber = " + seasonNumber + " and D.divisionId = " + divisionId + " order by F.fixtureDate").list();
+
+		tx.commit();
+
+		return fixtures;
+	}
+
+	public DomainObjectFactory getDomainObjectFactory() {
+		return domainObjectFactory;
+	}
+
+	public void setDomainObjectFactory(DomainObjectFactory domainObjectFactory) {
+		this.domainObjectFactory = domainObjectFactory;
+	}
 }
