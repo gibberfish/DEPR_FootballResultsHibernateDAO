@@ -10,7 +10,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import uk.co.mindbadger.footballresultsanalyser.domain.Division;
 import uk.co.mindbadger.footballresultsanalyser.domain.DivisionImpl;
 import uk.co.mindbadger.footballresultsanalyser.domain.DomainObjectFactory;
@@ -95,11 +94,11 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
-		Map <Integer, Division> divisionsMap = new HashMap <Integer, Division> (); 
+		Map<Integer, Division> divisionsMap = new HashMap<Integer, Division>();
 		for (Division division : divisions) {
 			divisionsMap.put(division.getDivisionId(), division);
 		}
-		
+
 		return divisionsMap;
 	}
 
@@ -118,11 +117,11 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
-		Map <Integer, Team> teamsMap = new HashMap <Integer, Team> (); 
+		Map<Integer, Team> teamsMap = new HashMap<Integer, Team>();
 		for (Team team : teams) {
 			teamsMap.put(team.getTeamId(), team);
 		}
-		
+
 		return teamsMap;
 	}
 
@@ -136,13 +135,6 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		tx = session.beginTransaction();
 
 		season = (Season) session.get(SeasonImpl.class, seasonNumber);
-
-		// Get the Seasons
-		// List seasonDivisions =
-		// session.createQuery("from SeasonDivision SD where SD.season.ssnNum = "
-		// + seasonNumber + " order by SD.divPos").list();
-		// List seasonDivisions =
-		// session.createQuery("from SeasonDivision SD").list();
 
 		tx.commit();
 
@@ -187,31 +179,67 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		return fixtures;
 	}
 
+	@Override
+	public Season addSeason(Integer seasonNum) {
+		Session session = sessions.get(Thread.currentThread());
+		Transaction tx = session.beginTransaction();
+
+		Season season = domainObjectFactory.createSeason(seasonNum);
+
+		session.save(season);
+		tx.commit();
+
+		return season;
+	}
+
+	@Override
+	public Division addDivision(String divisionName) {
+		Session session = sessions.get(Thread.currentThread());
+		Transaction tx = session.beginTransaction();
+
+		Division division = domainObjectFactory.createDivision(divisionName);
+
+		session.save(division);
+		tx.commit();
+
+		return division;
+	}
+
+	@Override
+	public Team addTeam(String teamName) {
+		Session session = sessions.get(Thread.currentThread());
+		Transaction tx = session.beginTransaction();
+
+		Team team = domainObjectFactory.createTeam(teamName);
+
+		session.save(team);
+		tx.commit();
+
+		return team;
+	}
+
+	@Override
+	public Fixture addFixture(Season season, Calendar fixtureDate, Division division, Team homeTeam, Team awayTeam, Integer homeGoals, Integer awayGoals) {
+		Session session = sessions.get(Thread.currentThread());
+		Transaction tx = session.beginTransaction();
+
+		Fixture fixture = domainObjectFactory.createFixture(season, homeTeam, awayTeam);
+		fixture.setDivision(division);
+		fixture.setFixtureDate(fixtureDate);
+		fixture.setHomeGoals(homeGoals);
+		fixture.setAwayGoals(awayGoals);
+
+		session.save(fixture);
+		tx.commit();
+
+		return fixture;
+	}
+
 	public DomainObjectFactory getDomainObjectFactory() {
 		return domainObjectFactory;
 	}
 
 	public void setDomainObjectFactory(DomainObjectFactory domainObjectFactory) {
 		this.domainObjectFactory = domainObjectFactory;
-	}
-
-	@Override
-	public Season addSeason(Integer seasonNum) {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public Division addDivision(String divisionName) {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public Fixture addFixture(Season season, Calendar fixtureDate, Division division, Team homeTeam, Team awayTeam, Integer homeGoals, Integer awayGoals) {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public Team addTeam(String teamName) {
-		throw new NotImplementedException();
 	}
 }
