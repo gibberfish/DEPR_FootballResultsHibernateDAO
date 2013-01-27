@@ -1,5 +1,6 @@
 package uk.co.mindbadger.footballresultsanalyser.dao;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import uk.co.mindbadger.footballresultsanalyser.domain.Division;
 import uk.co.mindbadger.footballresultsanalyser.domain.DivisionImpl;
 import uk.co.mindbadger.footballresultsanalyser.domain.DomainObjectFactory;
@@ -63,7 +65,24 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Division> getAllDivisions() {
+	public Season getSeason(Integer seasonNumber) {
+		Transaction tx = null;
+
+		Session session = sessions.get(Thread.currentThread());
+
+		List<Season> seasons = null;
+		tx = session.beginTransaction();
+
+		seasons = session.createQuery("select S from Season S where S.seasonNumber = " + seasonNumber).list();
+
+		tx.commit();
+
+		return seasons.get(0);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map<Integer, Division> getAllDivisions() {
 		Transaction tx = null;
 
 		Session session = sessions.get(Thread.currentThread());
@@ -76,12 +95,17 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
-		return divisions;
+		Map <Integer, Division> divisionsMap = new HashMap <Integer, Division> (); 
+		for (Division division : divisions) {
+			divisionsMap.put(division.getDivisionId(), division);
+		}
+		
+		return divisionsMap;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Team> getAllTeams() {
+	public Map<Integer, Team> getAllTeams() {
 		Transaction tx = null;
 
 		Session session = sessions.get(Thread.currentThread());
@@ -94,7 +118,12 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
-		return teams;
+		Map <Integer, Team> teamsMap = new HashMap <Integer, Team> (); 
+		for (Team team : teams) {
+			teamsMap.put(team.getTeamId(), team);
+		}
+		
+		return teamsMap;
 	}
 
 	@Override
@@ -164,5 +193,25 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 	public void setDomainObjectFactory(DomainObjectFactory domainObjectFactory) {
 		this.domainObjectFactory = domainObjectFactory;
+	}
+
+	@Override
+	public Season addSeason(Integer seasonNum) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Division addDivision(Integer divisionId, String divisionName) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Fixture addFixture(Integer fixtureId, Season season, Calendar fixtureDate, Division division, Team homeTeam, Team awayTeam, Integer homeGoals, Integer awayGoals) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Team addTeam(Integer teamId, String teamName) {
+		throw new NotImplementedException();
 	}
 }
