@@ -201,7 +201,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	}
 
 	@Override
-	public Division addDivision(Integer divisionId, String divisionName) {
+	public Division addDivision(String divisionName) {
 		throw new NotImplementedException();
 	}
 
@@ -211,7 +211,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	}
 
 	@Override
-	public Team addTeam(Integer teamId, String teamName) {
+	public Team addTeam(String teamName) {
 		throw new NotImplementedException();
 	}
 }
