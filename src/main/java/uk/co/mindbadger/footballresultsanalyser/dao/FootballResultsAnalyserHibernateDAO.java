@@ -206,7 +206,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	}
 
 	@Override
-	public Fixture addFixture(Integer fixtureId, Season season, Calendar fixtureDate, Division division, Team homeTeam, Team awayTeam, Integer homeGoals, Integer awayGoals) {
+	public Fixture addFixture(Season season, Calendar fixtureDate, Division division, Team homeTeam, Team awayTeam, Integer homeGoals, Integer awayGoals) {
 		throw new NotImplementedException();
 	}
 
