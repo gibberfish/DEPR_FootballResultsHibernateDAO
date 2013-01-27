@@ -72,11 +72,15 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		List<Season> seasons = null;
 		tx = session.beginTransaction();
 
-		seasons = session.createQuery("select S from Season S where S.seasonNumber = " + seasonNumber).list();
+		seasons = session.createQuery("select S from SeasonImpl S where S.seasonNumber = " + seasonNumber).list();
 
 		tx.commit();
 
-		return seasons.get(0);
+		if (seasons.size() == 1) {
+			return seasons.get(0);
+		} else {
+			return null;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -90,7 +94,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		tx = session.beginTransaction();
 
 		// Get the Divisions
-		divisions = session.createQuery("from Division").list();
+		divisions = session.createQuery("from DivisionImpl").list();
 
 		tx.commit();
 
@@ -113,7 +117,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		tx = session.beginTransaction();
 
 		// Get the Divisions
-		teams = session.createQuery("from Team").list();
+		teams = session.createQuery("from TeamImpl").list();
 
 		tx.commit();
 
