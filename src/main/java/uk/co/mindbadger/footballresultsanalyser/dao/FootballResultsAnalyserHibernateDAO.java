@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -222,14 +223,38 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		return team;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Fixture addFixture(Season season, Calendar fixtureDate, Division division, Team homeTeam, Team awayTeam, Integer homeGoals, Integer awayGoals) {
 		Session session = sessions.get(Thread.currentThread());
 		Transaction tx = session.beginTransaction();
 
-		Fixture fixture = domainObjectFactory.createFixture(season, homeTeam, awayTeam);
+		List<Fixture> fixtures = null;
+		StringBuffer sb = new StringBuffer("select F from FixtureImpl F join F.homeTeam T1 join F.awayTeam T2 join F.season S");
+		sb.append(" where S.seasonNumber = :seasonNumber ");
+		sb.append(" and T1.teamId = :homeTeamId ");
+		sb.append(" and T2.teamId = :awayTeamId ");
+		sb.append(" and F.fixtureDate = :fixtureDate");
+
+		Query query = session.createQuery(sb.toString());
+		query.setInteger("seasonNumber", season.getSeasonNumber());
+		query.setInteger("homeTeamId", homeTeam.getTeamId());
+		query.setInteger("awayTeamId", awayTeam.getTeamId());
+		query.setDate("fixtureDate", fixtureDate.getTime());
+		
+		fixtures = query.list();
+		
+		Fixture fixture = null;
+		if (fixtures.size() > 0) {
+			System.out.println("Got an existing fixture");
+			fixture = fixtures.get(0);
+		} else {
+			System.out.println("Adding new fixture");
+			fixture = domainObjectFactory.createFixture(season, homeTeam, awayTeam);
+			fixture.setFixtureDate(fixtureDate);
+		}
+		
 		fixture.setDivision(division);
-		fixture.setFixtureDate(fixtureDate);
 		fixture.setHomeGoals(homeGoals);
 		fixture.setAwayGoals(awayGoals);
 
