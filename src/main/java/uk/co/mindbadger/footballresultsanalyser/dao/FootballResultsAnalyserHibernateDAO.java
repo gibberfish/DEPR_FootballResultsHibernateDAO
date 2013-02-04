@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -26,6 +27,8 @@ import uk.co.mindbadger.footballresultsanalyser.hibernate.HibernateUtil;
 
 public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnalyserDAO {
 
+	Logger logger = Logger.getLogger(FootballResultsAnalyserHibernateDAO.class);
+	
 	private Map<Thread, Session> sessions = new HashMap<Thread, Session>();
 	private DomainObjectFactory domainObjectFactory;
 
@@ -246,10 +249,10 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		
 		Fixture fixture = null;
 		if (fixtures.size() > 0) {
-			System.out.println("Got an existing fixture");
+			logger.debug("Got an existing fixture");
 			fixture = fixtures.get(0);
 		} else {
-			System.out.println("Adding new fixture");
+			logger.debug("Adding new fixture");
 			fixture = domainObjectFactory.createFixture(season, homeTeam, awayTeam);
 			fixture.setFixtureDate(fixtureDate);
 		}
@@ -270,5 +273,21 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 	public void setDomainObjectFactory(DomainObjectFactory domainObjectFactory) {
 		this.domainObjectFactory = domainObjectFactory;
+	}
+
+	@Override
+	public List<Fixture> getUnplayedFixturesBeforeToday() {
+		Transaction tx = null;
+
+		Session session = sessions.get(Thread.currentThread());
+
+		List<Fixture> fixtures = null;
+		tx = session.beginTransaction();
+
+		fixtures = session.createQuery("select F from FixtureImpl F where F.fixtureDate <= current_date and F.homeGoals is null").list();
+
+		tx.commit();
+
+		return fixtures;
 	}
 }
