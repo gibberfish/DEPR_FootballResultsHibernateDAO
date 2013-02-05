@@ -1,5 +1,6 @@
 package uk.co.mindbadger.footballresultsanalyser.dao;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -231,29 +232,53 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	public Fixture addFixture(Season season, Calendar fixtureDate, Division division, Team homeTeam, Team awayTeam, Integer homeGoals, Integer awayGoals) {
 		Session session = sessions.get(Thread.currentThread());
 		Transaction tx = session.beginTransaction();
+		Fixture fixture = null;
+
+		// Have we got a fixture with a date?
 
 		List<Fixture> fixtures = null;
-		StringBuffer sb = new StringBuffer("select F from FixtureImpl F join F.homeTeam T1 join F.awayTeam T2 join F.season S");
+		StringBuffer sb = new StringBuffer("select F from FixtureImpl F join F.homeTeam T1 join F.awayTeam T2 join F.season S ");
 		sb.append(" where S.seasonNumber = :seasonNumber ");
 		sb.append(" and T1.teamId = :homeTeamId ");
 		sb.append(" and T2.teamId = :awayTeamId ");
-		sb.append(" and F.fixtureDate = :fixtureDate");
+		sb.append(" and F.fixtureDate = :fixtureDate ");
 
 		Query query = session.createQuery(sb.toString());
 		query.setInteger("seasonNumber", season.getSeasonNumber());
 		query.setInteger("homeTeamId", homeTeam.getTeamId());
 		query.setInteger("awayTeamId", awayTeam.getTeamId());
-		query.setDate("fixtureDate", fixtureDate.getTime());
+		query.setCalendarDate("fixtureDate", fixtureDate);
 		
 		fixtures = query.list();
 		
-		Fixture fixture = null;
 		if (fixtures.size() > 0) {
-			logger.debug("Got an existing fixture");
+			logger.debug("Got an existing fixture on the date specified (count: " + fixtures.size() + ")");
 			fixture = fixtures.get(0);
+			logger.debug("Fixture date: " + new SimpleDateFormat("yyyy-MM-dd").format(fixture.getFixtureDate().getTime()));
 		} else {
-			logger.debug("Adding new fixture");
-			fixture = domainObjectFactory.createFixture(season, homeTeam, awayTeam);
+			sb = new StringBuffer("select F from FixtureImpl F join F.homeTeam T1 join F.awayTeam T2 join F.season S join F.division D ");
+			sb.append(" where S.seasonNumber = :seasonNumber ");
+			sb.append(" and T1.teamId = :homeTeamId ");
+			sb.append(" and T2.teamId = :awayTeamId ");
+			sb.append(" and D.divisionId = :divisionId ");
+	
+			query = session.createQuery(sb.toString());
+			query.setInteger("seasonNumber", season.getSeasonNumber());
+			query.setInteger("homeTeamId", homeTeam.getTeamId());
+			query.setInteger("awayTeamId", awayTeam.getTeamId());
+			query.setInteger("divisionId", division.getDivisionId());
+			
+			fixtures = query.list();
+			
+			if (fixtures.size() > 0) {
+				logger.debug("Got an existing fixture withoug a date");
+				fixture = fixtures.get(0);
+				logger.debug("Shouldn't have one, but fixture date: " + new SimpleDateFormat("yyyy-MM-dd").format(fixture.getFixtureDate()));
+			} else {
+				logger.debug("No fixture found for these teams in this division for the season, so adding one...");
+				fixture = domainObjectFactory.createFixture(season, homeTeam, awayTeam);
+			}
+
 			fixture.setFixtureDate(fixtureDate);
 		}
 		
@@ -275,6 +300,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		this.domainObjectFactory = domainObjectFactory;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Fixture> getUnplayedFixturesBeforeToday() {
 		Transaction tx = null;
@@ -285,6 +311,23 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		tx = session.beginTransaction();
 
 		fixtures = session.createQuery("select F from FixtureImpl F where F.fixtureDate <= current_date and F.homeGoals is null").list();
+
+		tx.commit();
+
+		return fixtures;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Fixture> getFixturesWithNoFixtureDate() {
+		Transaction tx = null;
+
+		Session session = sessions.get(Thread.currentThread());
+
+		List<Fixture> fixtures = null;
+		tx = session.beginTransaction();
+
+		fixtures = session.createQuery("select F from FixtureImpl F where F.fixtureDate is null").list();
 
 		tx.commit();
 
