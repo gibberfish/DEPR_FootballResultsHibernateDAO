@@ -18,7 +18,7 @@
         <source>${maven.compiler.source}</source>
         <target>${maven.compiler.target}</target>
         <encoding>${project.build.sourceEncoding}</encoding>           
-        <executable>${env.JAVA_7_HOME}</executable>
+        <executable>${env.JAVA_HOME}</executable>
     </configuration>
   </plugin>
   </plugins>
@@ -60,13 +60,13 @@
     <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-core</artifactId>
-        <version>4.1.9.Final</version>
+        <version>4.3.0.Final</version>
     </dependency>
 	
     <dependency>
 		<groupId>org.hibernate</groupId>
 		<artifactId>hibernate-c3p0</artifactId>
-		<version>4.1.4.Final</version>
+		<version>4.3.0.Final</version>
 	</dependency>
 
 </dependencies>

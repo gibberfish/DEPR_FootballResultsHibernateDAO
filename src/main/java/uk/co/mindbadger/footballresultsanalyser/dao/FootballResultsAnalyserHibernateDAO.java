@@ -35,17 +35,24 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 	@Override
 	public void startSession() {
+		logger.debug("About to start new Hibernate session...");
 		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 		Session session = sessionFactory.openSession();
+		
+		logger.debug("Session open, about to attach it to current thread: " + Thread.currentThread());
 
 		sessions.put(Thread.currentThread(), session);
 	}
 
 	@Override
 	public void closeSession() {
+		logger.debug("About to close Hibernate session...");
+		
 		Session session = sessions.get(Thread.currentThread());
 		session.close();
 
+		logger.debug("Hibernate session closed, removing from sessions list...");
+		
 		sessions.remove(session);
 	}
 
@@ -64,6 +71,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
+		logger.debug("DAO getSeasons " + seasons.size());
+		
 		return seasons;
 	}
 
@@ -82,6 +91,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		tx.commit();
 
 		if (seasons.size() == 1) {
+			logger.debug("DAO getSeason " + seasonNumber);
 			return seasons.get(0);
 		} else {
 			return null;
@@ -108,6 +118,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 			divisionsMap.put(division.getDivisionId(), division);
 		}
 
+		logger.debug("DAO getAllDivisions " + divisionsMap.size());
+		
 		return divisionsMap;
 	}
 
@@ -131,6 +143,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 			teamsMap.put(team.getTeamId(), team);
 		}
 
+		logger.debug("DAO getAllTeams " + teamsMap.size());
+		
 		return teamsMap;
 	}
 
@@ -147,6 +161,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
+		logger.debug("DAO getDivisionsForSeason " + seasonNumber);
+		
 		return season.getDivisionsInSeason();
 	}
 
@@ -168,6 +184,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
+		logger.debug("DAO getTeamsForDivisionInSeason " + seasonNumber + ", div " + divisionId + ", count " + seasonDivision.getTeamsInSeasonDivision().size());
+		
 		return seasonDivision.getTeamsInSeasonDivision();
 	}
 
@@ -185,6 +203,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
+		logger.debug("DAO getFixturesForTeamInDivisionInSeason " + seasonNumber + ", div " + divisionId + ", team " + teamId + ", count " + fixtures.size());
+		
 		return fixtures;
 	}
 
@@ -198,6 +218,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		session.save(season);
 		tx.commit();
 
+		logger.debug("DAO addSeason " + seasonNum);
+		
 		return season;
 	}
 
@@ -210,7 +232,9 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		session.save(division);
 		tx.commit();
-
+		
+		logger.debug("DAO addDivision " + divisionName);
+		
 		return division;
 	}
 
@@ -224,6 +248,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		session.save(team);
 		tx.commit();
 
+		logger.debug("DAO addTeam " + teamName);
+		
 		return team;
 	}
 
@@ -283,7 +309,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 				logger.debug("No fixture found for these teams in this division for the season, so adding one...");
 				fixture = domainObjectFactory.createFixture(season, homeTeam, awayTeam);
 			}
-
+			
 			fixture.setFixtureDate(fixtureDate);
 		}
 		
@@ -294,6 +320,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		session.save(fixture);
 		tx.commit();
 
+		logger.debug("DAO addFixture " + fixture);
+		
 		return fixture;
 	}
 
@@ -319,6 +347,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
+		logger.debug("DAO getUnplayedFixturesBeforeToday " + fixtures.size());
+		
 		return fixtures;
 	}
 
@@ -336,6 +366,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
+		logger.debug("DAO getFixturesWithNoFixtureDate " + fixtures.size());
+		
 		return fixtures;
 	}
 }
