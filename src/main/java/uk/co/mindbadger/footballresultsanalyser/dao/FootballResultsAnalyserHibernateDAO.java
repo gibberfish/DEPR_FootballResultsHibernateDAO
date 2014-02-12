@@ -254,7 +254,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		if (fixtures.size() > 0) {
 			logger.debug("Got an existing fixture on the date specified (count: " + fixtures.size() + ")");
 			fixture = fixtures.get(0);
-			logger.debug("Fixture date: " + new SimpleDateFormat("yyyy-MM-dd").format(fixture.getFixtureDate().getTime()));
+			Calendar existingFixtureDate = fixture.getFixtureDate();
+			logger.debug("Fixture date: " + new SimpleDateFormat("yyyy-MM-dd").format(existingFixtureDate.getTime()));
 		} else {
 			sb = new StringBuffer("select F from FixtureImpl F join F.homeTeam T1 join F.awayTeam T2 join F.season S join F.division D ");
 			sb.append(" where S.seasonNumber = :seasonNumber ");
@@ -273,7 +274,11 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 			if (fixtures.size() > 0) {
 				logger.debug("Got an existing fixture withoug a date");
 				fixture = fixtures.get(0);
-				logger.debug("Shouldn't have one, but fixture date: " + new SimpleDateFormat("yyyy-MM-dd").format(fixture.getFixtureDate()));
+				Calendar existingFixtureDate = fixture.getFixtureDate();
+				logger.debug("fixtureDate = " + existingFixtureDate);
+				if (existingFixtureDate != null) {
+					logger.debug("Shouldn't have one, but fixture date: " + new SimpleDateFormat("yyyy-MM-dd").format(existingFixtureDate.getTime()));
+				}
 			} else {
 				logger.debug("No fixture found for these teams in this division for the season, so adding one...");
 				fixture = domainObjectFactory.createFixture(season, homeTeam, awayTeam);
