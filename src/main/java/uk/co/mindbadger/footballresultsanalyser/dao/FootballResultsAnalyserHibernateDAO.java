@@ -24,7 +24,6 @@ import uk.co.mindbadger.footballresultsanalyser.domain.SeasonDivisionImpl;
 import uk.co.mindbadger.footballresultsanalyser.domain.SeasonDivisionTeam;
 import uk.co.mindbadger.footballresultsanalyser.domain.SeasonImpl;
 import uk.co.mindbadger.footballresultsanalyser.domain.Team;
-import uk.co.mindbadger.footballresultsanalyser.hibernate.HibernateUtil;
 
 public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnalyserDAO {
 
@@ -32,11 +31,11 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	
 	private Map<Thread, Session> sessions = new HashMap<Thread, Session>();
 	private DomainObjectFactory domainObjectFactory;
+	private SessionFactory sessionFactory;
 
 	@Override
 	public void startSession() {
 		logger.debug("About to start new Hibernate session...");
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 		Session session = sessionFactory.openSession();
 		
 		logger.debug("Session open, about to attach it to current thread: " + Thread.currentThread());
@@ -369,5 +368,13 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		logger.debug("DAO getFixturesWithNoFixtureDate " + fixtures.size());
 		
 		return fixtures;
+	}
+
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 	}
 }
