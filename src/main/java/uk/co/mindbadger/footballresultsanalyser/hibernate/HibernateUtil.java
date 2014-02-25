@@ -12,7 +12,7 @@ public class HibernateUtil {
        try {
     	   Configuration configuration = new Configuration();
     	   configuration.configure();
-    	   ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();        
+    	   ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).build();        
     	   SessionFactory sessionFactory = configuration.buildSessionFactory(serviceRegistry);
     	   return sessionFactory;
     	   
