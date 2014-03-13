@@ -7,11 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.stereotype.Repository;
 
 import uk.co.mindbadger.footballresultsanalyser.domain.Division;
 import uk.co.mindbadger.footballresultsanalyser.domain.DivisionImpl;
@@ -25,10 +28,10 @@ import uk.co.mindbadger.footballresultsanalyser.domain.SeasonDivisionTeam;
 import uk.co.mindbadger.footballresultsanalyser.domain.SeasonImpl;
 import uk.co.mindbadger.footballresultsanalyser.domain.Team;
 
+@Repository("footballResultsAnalyserHibernateDao")
 public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnalyserDAO {
 
 	Logger logger = Logger.getLogger(FootballResultsAnalyserHibernateDAO.class);
-	
 	private Map<Thread, Session> sessions = new HashMap<Thread, Session>();
 	private DomainObjectFactory domainObjectFactory;
 	private SessionFactory sessionFactory;
@@ -55,7 +58,6 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		sessions.remove(session);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Season> getSeasons() {
 		Transaction tx = null;
@@ -255,6 +257,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	@SuppressWarnings("unchecked")
 	@Override
 	public Fixture addFixture(Season season, Calendar fixtureDate, Division division, Team homeTeam, Team awayTeam, Integer homeGoals, Integer awayGoals) {
+		logger.info("About to add fixture, ssn="+season+", date="+String.format("%1$te-%1$tm-%1$tY", fixtureDate)+", div="+division+", hmTeam="+homeTeam+", awTeam="+awayTeam+", score="+homeGoals+"-"+awayGoals);
 		Session session = sessions.get(Thread.currentThread());
 		Transaction tx = session.beginTransaction();
 		Fixture fixture = null;
@@ -277,7 +280,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		fixtures = query.list();
 		
 		if (fixtures.size() > 0) {
-			logger.debug("Got an existing fixture on the date specified (count: " + fixtures.size() + ")");
+			logger.info("Got an existing fixture on the date specified (count: " + fixtures.size() + ")");
 			fixture = fixtures.get(0);
 			Calendar existingFixtureDate = fixture.getFixtureDate();
 			logger.debug("Fixture date: " + new SimpleDateFormat("yyyy-MM-dd").format(existingFixtureDate.getTime()));
@@ -297,12 +300,11 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 			fixtures = query.list();
 			
 			if (fixtures.size() > 0) {
-				logger.debug("Got an existing fixture withoug a date");
 				fixture = fixtures.get(0);
 				Calendar existingFixtureDate = fixture.getFixtureDate();
-				logger.debug("fixtureDate = " + existingFixtureDate);
+				logger.info("Got an existing fixture for these teams, but not on the date supplied");
 				if (existingFixtureDate != null) {
-					logger.debug("Shouldn't have one, but fixture date: " + new SimpleDateFormat("yyyy-MM-dd").format(existingFixtureDate.getTime()));
+					logger.info("...Shouldn't have one, but fixture date: " + new SimpleDateFormat("yyyy-MM-dd").format(existingFixtureDate.getTime()));
 				}
 			} else {
 				logger.debug("No fixture found for these teams in this division for the season, so adding one...");
@@ -346,7 +348,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
-		logger.debug("DAO getUnplayedFixturesBeforeToday " + fixtures.size());
+		logger.info("DAO getUnplayedFixturesBeforeToday, returned " + fixtures.size() + " fixtures.");
 		
 		return fixtures;
 	}
@@ -365,7 +367,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
-		logger.debug("DAO getFixturesWithNoFixtureDate " + fixtures.size());
+		logger.info("DAO getFixturesWithNoFixtureDate, returned " + fixtures.size() + " fixtures.");
 		
 		return fixtures;
 	}
@@ -374,6 +376,7 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		return sessionFactory;
 	}
 
+	@Resource(name="sessionFactory")
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
