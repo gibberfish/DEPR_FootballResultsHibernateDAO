@@ -4,31 +4,31 @@ import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
 
 @Embeddable
-public class SeasonDivisionIdImpl implements SeasonDivisionId {
+public class SeasonDivisionIdImpl implements SeasonDivisionId<Integer> {
     private static final long serialVersionUID = 2044020611013634053L;
 
-    private Season season;
-    private Division division;
+    private Season<Integer> season;
+    private Division<Integer> division;
 
     @Override
     @ManyToOne (targetEntity=SeasonImpl.class)
-    public Season getSeason() {
+    public Season<Integer> getSeason() {
 	return season;
     }
 
     @Override
-    public void setSeason(Season season) {
+    public void setSeason(Season<Integer> season) {
 	this.season = season;
     }
 
     @Override
     @ManyToOne (targetEntity=DivisionImpl.class)
-    public Division getDivision() {
+    public Division<Integer> getDivision() {
 	return division;
     }
 
     @Override
-    public void setDivision(Division division) {
+    public void setDivision(Division<Integer> division) {
 	this.division = division;
     }
 
@@ -39,7 +39,7 @@ public class SeasonDivisionIdImpl implements SeasonDivisionId {
 	if (o == null || getClass() != o.getClass())
 	    return false;
 
-	SeasonDivisionId that = (SeasonDivisionId) o;
+	SeasonDivisionId<Integer> that = (SeasonDivisionId<Integer>) o;
 
 	if (season != null ? !season.equals(that.getSeason()) : that.getSeason() != null)
 	    return false;

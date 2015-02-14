@@ -8,7 +8,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="team", catalog="football")
-public class TeamImpl implements Team {
+public class TeamImpl implements Team<Integer> {
 	private Integer teamId;
 	private String teamName;
 	private String teamShortName;
@@ -58,4 +58,9 @@ public class TeamImpl implements Team {
 //	public void setAwayFixturesForTeam(Set<Fixture> awayFixturesForTeam) {
 //		this.awayFixturesForTeam = awayFixturesForTeam;
 //	}
+
+	@Override
+	public String getTeamIdAsString() {
+		return teamId.toString();
+	}
 }

@@ -13,15 +13,15 @@ import javax.persistence.Temporal;
 
 @Entity
 @Table(name = "fixture", catalog = "football")
-public class FixtureImpl implements Fixture {
+public class FixtureImpl implements Fixture<Integer> {
     private static final long serialVersionUID = -1065165521448191394L;
 
     private Integer fixtureId;
-    private Season season;
-    private Team homeTeam;
-    private Team awayTeam;
+    private Season<Integer> season;
+    private Team<Integer> homeTeam;
+    private Team<Integer> awayTeam;
     private Calendar fixtureDate;
-    private Division division;
+    private Division<Integer> division;
     private Integer homeGoals;
     private Integer awayGoals;
 
@@ -40,33 +40,33 @@ public class FixtureImpl implements Fixture {
     @Override
     @ManyToOne (targetEntity=SeasonImpl.class)
     @JoinColumn(name = "SSN_NUM")
-    public Season getSeason() {
+    public Season<Integer> getSeason() {
 	return season;
     }
     @Override
-    public void setSeason(Season season) {
+    public void setSeason(Season<Integer> season) {
 	this.season = season;
     }
 
     @Override
     @ManyToOne (targetEntity=TeamImpl.class)
     @JoinColumn(name = "HOME_TEAM_ID")
-    public Team getHomeTeam() {
+    public Team<Integer> getHomeTeam() {
 	return homeTeam;
     }
     @Override
-    public void setHomeTeam(Team homeTeam) {
+    public void setHomeTeam(Team<Integer> homeTeam) {
 	this.homeTeam = homeTeam;
     }
 
     @Override
     @ManyToOne (targetEntity=TeamImpl.class)
     @JoinColumn(name = "AWAY_TEAM_ID")
-    public Team getAwayTeam() {
+    public Team<Integer> getAwayTeam() {
 	return awayTeam;
     }
     @Override
-    public void setAwayTeam(Team awayTeam) {
+    public void setAwayTeam(Team<Integer> awayTeam) {
 	this.awayTeam = awayTeam;
     }
 
@@ -84,11 +84,11 @@ public class FixtureImpl implements Fixture {
     @Override
     @ManyToOne (targetEntity=DivisionImpl.class)
     @JoinColumn(name = "DIV_ID")
-    public Division getDivision() {
+    public Division<Integer> getDivision() {
 	return division;
     }
     @Override
-    public void setDivision(Division division) {
+    public void setDivision(Division<Integer> division) {
 	this.division = division;
     }
 

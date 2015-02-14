@@ -13,11 +13,11 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="season", catalog="football")
-public class SeasonImpl implements Season {
+public class SeasonImpl implements Season<Integer> {
 	private static final long serialVersionUID = -4032527106145900975L;
 
 	private Integer seasonNumber;
-	private Set<SeasonDivision> divisionsInSeason = new HashSet<SeasonDivision>(0);
+	private Set<SeasonDivision<Integer>> divisionsInSeason = new HashSet<SeasonDivision<Integer>>(0);
 	//public Set<Fixture> fixturesInSeason;
 
 	public SeasonImpl () {}
@@ -37,10 +37,10 @@ public class SeasonImpl implements Season {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "primaryKey.season", cascade=CascadeType.ALL, targetEntity=SeasonDivisionImpl.class)
-	public Set<SeasonDivision> getDivisionsInSeason() {
+	public Set<SeasonDivision<Integer>> getDivisionsInSeason() {
 		return divisionsInSeason;
 	}
-	public void setDivisionsInSeason(Set<SeasonDivision> divisionsInSeason) {
+	public void setDivisionsInSeason(Set<SeasonDivision<Integer>> divisionsInSeason) {
 		this.divisionsInSeason = divisionsInSeason;
 	}
 	

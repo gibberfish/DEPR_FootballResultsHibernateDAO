@@ -13,12 +13,12 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "division", catalog = "football")
-public class DivisionImpl implements Division {
+public class DivisionImpl implements Division<Integer> {
     private static final long serialVersionUID = 693092329472146716L;
 
     private Integer divisionId;
     private String divisionName;
-    private Set<SeasonDivision> seasonsForDivision = new HashSet<SeasonDivision>();
+    private Set<SeasonDivision<Integer>> seasonsForDivision = new HashSet<SeasonDivision<Integer>>();
 
     public DivisionImpl() { }
     
@@ -52,12 +52,17 @@ public class DivisionImpl implements Division {
 
     @Override
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "primaryKey.division", targetEntity=SeasonDivisionImpl.class)
-    public Set<SeasonDivision> getSeasonsForDivision() {
+    public Set<SeasonDivision<Integer>> getSeasonsForDivision() {
 	return seasonsForDivision;
     }
 
     @Override
-    public void setSeasonsForDivision(Set<SeasonDivision> seasonsForDivision) {
+    public void setSeasonsForDivision(Set<SeasonDivision<Integer>> seasonsForDivision) {
 	this.seasonsForDivision = seasonsForDivision;
     }
+
+	@Override
+	public String getDivisionIdAsString() {
+		return divisionId.toString();
+	}
 }

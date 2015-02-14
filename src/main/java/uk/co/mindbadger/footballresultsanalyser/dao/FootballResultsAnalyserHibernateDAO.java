@@ -29,11 +29,11 @@ import uk.co.mindbadger.footballresultsanalyser.domain.SeasonImpl;
 import uk.co.mindbadger.footballresultsanalyser.domain.Team;
 
 @Repository("footballResultsAnalyserHibernateDao")
-public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnalyserDAO {
+public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnalyserDAO<Integer> {
 
 	Logger logger = Logger.getLogger(FootballResultsAnalyserHibernateDAO.class);
 	private Map<Thread, Session> sessions = new HashMap<Thread, Session>();
-	private DomainObjectFactory domainObjectFactory;
+	private DomainObjectFactory<Integer> domainObjectFactory;
 	private SessionFactory sessionFactory;
 
 	@Override
@@ -59,12 +59,12 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	}
 
 	@Override
-	public List<Season> getSeasons() {
+	public List<Season<Integer>> getSeasons() {
 		Transaction tx = null;
 
 		Session session = sessions.get(Thread.currentThread());
 
-		List<Season> seasons = null;
+		List<Season<Integer>> seasons = null;
 		tx = session.beginTransaction();
 
 		// Get the Seasons
@@ -79,12 +79,12 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Season getSeason(Integer seasonNumber) {
+	public Season<Integer> getSeason(Integer seasonNumber) {
 		Transaction tx = null;
 
 		Session session = sessions.get(Thread.currentThread());
 
-		List<Season> seasons = null;
+		List<Season<Integer>> seasons = null;
 		tx = session.beginTransaction();
 
 		seasons = session.createQuery("select S from SeasonImpl S where S.seasonNumber = " + seasonNumber).list();
@@ -101,12 +101,12 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<Integer, Division> getAllDivisions() {
+	public Map<Integer, Division<Integer>> getAllDivisions() {
 		Transaction tx = null;
 
 		Session session = sessions.get(Thread.currentThread());
 
-		List<Division> divisions = null;
+		List<Division<Integer>> divisions = null;
 		tx = session.beginTransaction();
 
 		// Get the Divisions
@@ -114,8 +114,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
-		Map<Integer, Division> divisionsMap = new HashMap<Integer, Division>();
-		for (Division division : divisions) {
+		Map<Integer, Division<Integer>> divisionsMap = new HashMap<Integer, Division<Integer>>();
+		for (Division<Integer> division : divisions) {
 			divisionsMap.put(division.getDivisionId(), division);
 		}
 
@@ -126,12 +126,12 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<Integer, Team> getAllTeams() {
+	public Map<Integer, Team<Integer>> getAllTeams() {
 		Transaction tx = null;
 
 		Session session = sessions.get(Thread.currentThread());
 
-		List<Team> teams = null;
+		List<Team<Integer>> teams = null;
 		tx = session.beginTransaction();
 
 		// Get the Divisions
@@ -139,8 +139,8 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 		tx.commit();
 
-		Map<Integer, Team> teamsMap = new HashMap<Integer, Team>();
-		for (Team team : teams) {
+		Map<Integer, Team<Integer>> teamsMap = new HashMap<Integer, Team<Integer>>();
+		for (Team<Integer> team : teams) {
 			teamsMap.put(team.getTeamId(), team);
 		}
 
@@ -150,15 +150,15 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	}
 
 	@Override
-	public Set<SeasonDivision> getDivisionsForSeason(int seasonNumber) {
+	public Set<SeasonDivision<Integer>> getDivisionsForSeason(int seasonNumber) {
 		Transaction tx = null;
 
 		Session session = sessions.get(Thread.currentThread());
 
-		Season season = null;
+		Season<Integer> season = null;
 		tx = session.beginTransaction();
 
-		season = (Season) session.get(SeasonImpl.class, seasonNumber);
+		season = (Season<Integer>) session.get(SeasonImpl.class, seasonNumber);
 
 		tx.commit();
 
@@ -168,20 +168,20 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	}
 
 	@Override
-	public Set<SeasonDivisionTeam> getTeamsForDivisionInSeason(int seasonNumber, int divisionId) {
+	public Set<SeasonDivisionTeam<Integer>> getTeamsForDivisionInSeason(int seasonNumber, int divisionId) {
 		Transaction tx = null;
 
 		Session session = sessions.get(Thread.currentThread());
 
-		SeasonDivision seasonDivision = null;
+		SeasonDivision<Integer> seasonDivision = null;
 		tx = session.beginTransaction();
 
-		Season season = (Season) session.get(SeasonImpl.class, seasonNumber);
-		Division division = (Division) session.get(DivisionImpl.class, divisionId);
+		Season<Integer> season = (Season<Integer>) session.get(SeasonImpl.class, seasonNumber);
+		Division<Integer> division = (Division<Integer>) session.get(DivisionImpl.class, divisionId);
 
-		SeasonDivisionId seasonDivisionId = domainObjectFactory.createSeasonDivisionId(season, division);
+		SeasonDivisionId<Integer> seasonDivisionId = domainObjectFactory.createSeasonDivisionId(season, division);
 
-		seasonDivision = (SeasonDivision) session.get(SeasonDivisionImpl.class, seasonDivisionId);
+		seasonDivision = (SeasonDivision<Integer>) session.get(SeasonDivisionImpl.class, seasonDivisionId);
 
 		tx.commit();
 
@@ -192,12 +192,12 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Fixture> getFixturesForTeamInDivisionInSeason(int seasonNumber, int divisionId, int teamId) {
+	public List<Fixture<Integer>> getFixturesForTeamInDivisionInSeason(int seasonNumber, int divisionId, int teamId) {
 		Transaction tx = null;
 
 		Session session = sessions.get(Thread.currentThread());
 
-		List<Fixture> fixtures = null;
+		List<Fixture<Integer>> fixtures = null;
 		tx = session.beginTransaction();
 
 		fixtures = session.createQuery("select F from FixtureImpl F join F.division D join F.season S" + " where S.seasonNumber = " + seasonNumber + " and D.divisionId = " + divisionId + " order by F.fixtureDate").list();
@@ -225,11 +225,11 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	}
 
 	@Override
-	public Division addDivision(String divisionName) {
+	public Division<Integer> addDivision(String divisionName) {
 		Session session = sessions.get(Thread.currentThread());
 		Transaction tx = session.beginTransaction();
 
-		Division division = domainObjectFactory.createDivision(divisionName);
+		Division<Integer> division = domainObjectFactory.createDivision(divisionName);
 
 		session.save(division);
 		tx.commit();
@@ -240,11 +240,11 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 	}
 
 	@Override
-	public Team addTeam(String teamName) {
+	public Team<Integer> addTeam(String teamName) {
 		Session session = sessions.get(Thread.currentThread());
 		Transaction tx = session.beginTransaction();
 
-		Team team = domainObjectFactory.createTeam(teamName);
+		Team<Integer> team = domainObjectFactory.createTeam(teamName);
 
 		session.save(team);
 		tx.commit();
@@ -256,15 +256,15 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Fixture addFixture(Season season, Calendar fixtureDate, Division division, Team homeTeam, Team awayTeam, Integer homeGoals, Integer awayGoals) {
+	public Fixture<Integer> addFixture(Season<Integer> season, Calendar fixtureDate, Division<Integer> division, Team<Integer> homeTeam, Team<Integer> awayTeam, Integer homeGoals, Integer awayGoals) {
 		logger.info("About to add fixture, ssn="+season+", date="+String.format("%1$te-%1$tm-%1$tY", fixtureDate)+", div="+division+", hmTeam="+homeTeam+", awTeam="+awayTeam+", score="+homeGoals+"-"+awayGoals);
 		Session session = sessions.get(Thread.currentThread());
 		Transaction tx = session.beginTransaction();
-		Fixture fixture = null;
+		Fixture<Integer> fixture = null;
 
 		// Have we got a fixture with a date?
 
-		List<Fixture> fixtures = null;
+		List<Fixture<Integer>> fixtures = null;
 		StringBuffer sb = new StringBuffer("select F from FixtureImpl F join F.homeTeam T1 join F.awayTeam T2 join F.season S ");
 		sb.append(" where S.seasonNumber = :seasonNumber ");
 		sb.append(" and T1.teamId = :homeTeamId ");
@@ -326,22 +326,22 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 		return fixture;
 	}
 
-	public DomainObjectFactory getDomainObjectFactory() {
+	public DomainObjectFactory<Integer> getDomainObjectFactory() {
 		return domainObjectFactory;
 	}
 
-	public void setDomainObjectFactory(DomainObjectFactory domainObjectFactory) {
+	public void setDomainObjectFactory(DomainObjectFactory<Integer> domainObjectFactory) {
 		this.domainObjectFactory = domainObjectFactory;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Fixture> getUnplayedFixturesBeforeToday() {
+	public List<Fixture<Integer>> getUnplayedFixturesBeforeToday() {
 		Transaction tx = null;
 
 		Session session = sessions.get(Thread.currentThread());
 
-		List<Fixture> fixtures = null;
+		List<Fixture<Integer>> fixtures = null;
 		tx = session.beginTransaction();
 
 		fixtures = session.createQuery("select F from FixtureImpl F where F.fixtureDate <= current_date and F.homeGoals is null").list();
@@ -355,12 +355,12 @@ public class FootballResultsAnalyserHibernateDAO implements FootballResultsAnaly
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Fixture> getFixturesWithNoFixtureDate() {
+	public List<Fixture<Integer>> getFixturesWithNoFixtureDate() {
 		Transaction tx = null;
 
 		Session session = sessions.get(Thread.currentThread());
 
-		List<Fixture> fixtures = null;
+		List<Fixture<Integer>> fixtures = null;
 		tx = session.beginTransaction();
 
 		fixtures = session.createQuery("select F from FixtureImpl F where F.fixtureDate is null").list();

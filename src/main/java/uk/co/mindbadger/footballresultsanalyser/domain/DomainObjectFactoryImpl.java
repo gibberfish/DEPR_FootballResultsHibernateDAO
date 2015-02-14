@@ -1,6 +1,6 @@
 package uk.co.mindbadger.footballresultsanalyser.domain;
 
-public class DomainObjectFactoryImpl implements DomainObjectFactory {
+public class DomainObjectFactoryImpl implements DomainObjectFactory<Integer> {
 	
 	@Override
 	public Season createSeason(Integer seasonNum) {
@@ -10,22 +10,22 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
 	}
 
 	@Override
-	public Division createDivision(String divisionName) {
-		Division division = new DivisionImpl();
+	public Division<Integer> createDivision(String divisionName) {
+		Division<Integer> division = new DivisionImpl();
 		division.setDivisionName(divisionName);
 		return division;
 	}
 	
 	@Override
-	public Team createTeam(String teamName) {
-		Team team = new TeamImpl ();
+	public Team<Integer> createTeam(String teamName) {
+		Team<Integer> team = new TeamImpl ();
 		team.setTeamName(teamName);
 		return team;
 	}
 
 	@Override
-	public Fixture createFixture(Season season, Team homeTeam, Team awayTeam) {
-		Fixture fixture = new FixtureImpl();
+	public Fixture<Integer> createFixture(Season<Integer> season, Team<Integer> homeTeam, Team<Integer> awayTeam) {
+		Fixture<Integer> fixture = new FixtureImpl();
 		fixture.setSeason(season);
 		fixture.setHomeTeam(homeTeam);
 		fixture.setAwayTeam(awayTeam);
@@ -33,19 +33,19 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
 	}
 
 	@Override
-	public SeasonDivision createSeasonDivision(Season season, Division division) {
+	public SeasonDivision createSeasonDivision(Season<Integer> season, Division<Integer> division) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public SeasonDivisionTeam createSeasonDivisionTeam(SeasonDivision seasonDivision, Team team) {
+	public SeasonDivisionTeam createSeasonDivisionTeam(SeasonDivision<Integer> seasonDivision, Team<Integer> team) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public SeasonDivisionId createSeasonDivisionId(Season season, Division division) {
+	public SeasonDivisionId createSeasonDivisionId(Season<Integer> season, Division<Integer> division) {
 		SeasonDivisionId seasonDivisionId = new SeasonDivisionIdImpl();
 		seasonDivisionId.setSeason(season);
 		seasonDivisionId.setDivision(division);
@@ -53,7 +53,7 @@ public class DomainObjectFactoryImpl implements DomainObjectFactory {
 	}
 
 	@Override
-	public SeasonDivisionTeamId createSeasonDivisionTeamId(SeasonDivision seasonDivision, Team team) {
+	public SeasonDivisionTeamId createSeasonDivisionTeamId(SeasonDivision<Integer> seasonDivision, Team<Integer> team) {
 		SeasonDivisionTeamId seasonDivisionTeamId = new SeasonDivisionTeamIdImpl();
 		seasonDivisionTeamId.setSeasonDivision(seasonDivision);
 		seasonDivisionTeamId.setTeam(team);

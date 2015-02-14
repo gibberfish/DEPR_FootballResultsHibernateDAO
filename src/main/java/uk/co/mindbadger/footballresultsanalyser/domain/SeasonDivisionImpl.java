@@ -9,11 +9,8 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
-import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -26,43 +23,43 @@ import org.hibernate.annotations.Target;
 			joinColumns = @JoinColumn(name = "SSN_NUM")),
 		@AssociationOverride(name = "primaryKey.division", 
 			joinColumns = @JoinColumn(name = "DIV_ID")) })
-public class SeasonDivisionImpl implements SeasonDivision {
+public class SeasonDivisionImpl implements SeasonDivision<Integer> {
 	private static final long serialVersionUID = -862413151112264079L;
 	
-	private SeasonDivisionId primaryKey = new SeasonDivisionIdImpl();
+	private SeasonDivisionId<Integer> primaryKey = new SeasonDivisionIdImpl();
 	private int divisionPosition;
-	private Set<SeasonDivisionTeam> teamsInSeasonDivision = new HashSet<SeasonDivisionTeam>(0);
+	private Set<SeasonDivisionTeam<Integer>> teamsInSeasonDivision = new HashSet<SeasonDivisionTeam<Integer>>(0);
 	
 	@Override
 	@EmbeddedId
 	@Target(SeasonDivisionIdImpl.class)
-	public SeasonDivisionId getPrimaryKey() {
+	public SeasonDivisionId<Integer> getPrimaryKey() {
 		return primaryKey;
 	}
 	@Override
-	public void setPrimaryKey(SeasonDivisionId primaryKey) {
+	public void setPrimaryKey(SeasonDivisionId<Integer> primaryKey) {
 		this.primaryKey = primaryKey;
 	}
 
 	@Override
 	@Transient
 	@Target(SeasonImpl.class)
-	public Season getSeason() {
+	public Season<Integer> getSeason() {
 		return primaryKey.getSeason();
 	}
 	@Override
-	public void setSeason(Season season) {
+	public void setSeason(Season<Integer> season) {
 		primaryKey.setSeason(season);
 	}
 	
 	@Override
 	@Transient
 	@Target(DivisionImpl.class)
-	public Division getDivision() {
+	public Division<Integer> getDivision() {
 		return primaryKey.getDivision();
 	}
 	@Override
-	public void setDivision(Division division) {
+	public void setDivision(Division<Integer> division) {
 		primaryKey.setDivision(division);
 	}
 	
@@ -78,11 +75,11 @@ public class SeasonDivisionImpl implements SeasonDivision {
 	
 	@Override
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "primaryKey.seasonDivision", targetEntity=SeasonDivisionTeamImpl.class)
-	public Set<SeasonDivisionTeam> getTeamsInSeasonDivision() {
+	public Set<SeasonDivisionTeam<Integer>> getTeamsInSeasonDivision() {
 		return teamsInSeasonDivision;
 	}
 	@Override
-	public void setTeamsInSeasonDivision(Set<SeasonDivisionTeam> teamsInSeasonDivision) {
+	public void setTeamsInSeasonDivision(Set<SeasonDivisionTeam<Integer>> teamsInSeasonDivision) {
 		this.teamsInSeasonDivision = teamsInSeasonDivision;
 	}
 }
